@@ -1,0 +1,446 @@
+//
+#include <iostream>
+
+using namespace std;
+int m,k;
+
+struct node //defining the node class(struct)
+{
+	int nx1,ny1,nkey,ngrp;
+  int nnkey;
+  string nhead;
+
+   int address;
+    int value;
+
+	node *p_node; // prevoous node ponter
+	node *n_node; //next node pointer
+};
+
+class MaxHeap
+{
+    private:
+        node *heap;
+        int size, maxCapacity;
+    public:
+        MaxHeap()
+        {
+            size = 0;
+            maxCapacity = 10;
+            heap = new node[maxCapacity];
+        }
+
+        MaxHeap(int capacity)
+        {
+            size = 0;
+            maxCapacity = capacity;
+            heap = new node[maxCapacity];
+        }
+
+        bool isFull()
+        {
+            if (size == maxCapacity)
+                return true;
+            return false;
+        }
+
+        void insert(int address, int value)
+        {
+            if (isFull())
+            {
+                //create a bigger array
+                //copy elements from heap into bigger array
+                //delete old array
+
+                throw std::range_error("Heap is full!");
+            }
+
+            heap[size].value = value;
+            heap[size].address = address;
+            int childIndex = size;
+            int parentIndex = (childIndex - 1)/2;
+            //parent at node i = (i - 1)/2;
+            //left child = (2i + 1);
+            //right child = (2i + 2);
+            //While we have not gotten to root, you want to keep swapping the parent for
+            //the child if the child is greater than the parent
+            while (parentIndex >= 0 && heap[parentIndex].value < heap[childIndex].value)
+            {
+                    node temp = heap[parentIndex];
+                    heap[parentIndex] = heap[childIndex];
+                    heap[childIndex] = temp;
+                    childIndex = parentIndex;
+                    parentIndex = (parentIndex - 1)/2;
+
+            }
+
+            size++;
+        }
+
+        void peek()
+        {
+            std::cout << heap[0].value;
+        }
+
+        node pop()
+        {
+            node max = heap[0];
+            heap[0] = heap[size - 1];
+            size--;
+            maxHeapify(0);
+            return max;
+        }
+
+        void maxHeapify(int index)
+        {
+            int leftChild, rightChild;
+            leftChild = 2 * index + 1;
+            rightChild = 2 * index + 2;
+
+            int maxIndex = index;
+            if (leftChild <= size && heap[leftChild].value > heap[maxIndex].value)
+                maxIndex = leftChild;
+            if (rightChild <= size && heap[rightChild].value > heap[maxIndex].value)
+                maxIndex = rightChild;
+
+            if (maxIndex != index)
+            {
+                node temp = heap[maxIndex];
+                heap[maxIndex] = heap[index];
+                heap[index] = temp;
+
+                maxHeapify(maxIndex);
+            }
+        }
+
+        bool isEmpty()
+        {
+            if (size == 0)
+                return true;
+            return false;
+        }
+
+        int getSize()
+        {
+            return size;
+        }
+
+        void print()
+        {
+            while (!isEmpty())
+            {
+                //std::cout << pop().value << '\n';
+                peek();
+                std::cout << '\n';
+                pop();
+            }
+        }
+
+};
+
+//end heap
+
+class double_LL
+{
+
+
+public:
+	node *front; // pointer to the first node of the list
+	node *end;	 // pointer to the last node of the list
+	// MaxHeap maxHeap1 = MaxHeap(100000000);
+	double_LL()
+	{
+		front = NULL;
+		end = NULL;
+	}
+	void add_end(int ax1,int ay1,int akey, int ankey)
+	{
+		// create new node
+		node *temp;
+		temp = new node();
+		temp->nx1 = ax1;
+    temp->ny1 = ay1;
+    temp->nkey = akey;
+    temp->nnkey = ankey;
+
+		temp->p_node = end;
+		temp->n_node = NULL;
+		// if list is empty
+		if (end == NULL)
+			front = temp;
+		else
+			end->n_node = temp;
+		end = temp;
+	}
+  int find(int fkey) //checking the list to see if the address is already there
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL) //traversing the list and checking if address is in it
+		{
+			if (traverse->nkey == fkey)
+			{
+				return 1;//return 1 for "tru it is there"
+			}
+
+			traverse = traverse->n_node;
+		}
+		return 0;//return 0 for "Not there"
+	}
+  
+   int find_nkey(int fkey) //checking the list to see if the address is already there
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL) //traversing the list and checking if address is in it
+		{
+      	if (traverse->nnkey == fkey )
+			{
+        traverse->nhead = "head";
+
+				return 1;//return 1 for "tru it is next to someone"
+			}
+
+			traverse = traverse->n_node;
+		}
+		return 0;//return 0 for "Not there"
+	}
+	int fix_it(int fkey,int fnkey) //checking the list to see if the address is already there
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL) //traversing the list and checking if address is in it
+		{
+			if (traverse->nkey == fkey)
+			{
+				traverse->nnkey=fnkey;
+			}
+			traverse = traverse->n_node;
+		}
+		return 1;
+	}
+	void increm(long key, int re) //increments the req for addresses that have been seen before
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL)
+		{
+
+			// cout<<traverse->data<<endl;
+			if (traverse->nkey == key)
+			{
+				traverse->ngrp= traverse->ngrp + re;
+			}
+			traverse = traverse->n_node;
+		}
+	}
+	void forward_print() //seasrching for the seen address
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL)
+		{	
+				std::cout << traverse->nx1 << " , " << traverse->ny1 << " ,key: "<< traverse->nkey <<" ,next: " << traverse->nnkey<<",  "<< traverse->nhead<<" => ";
+
+			traverse = traverse->n_node;
+		}
+	}
+  
+  	void forward_grp() //seasrching for the seen address
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL)
+		{	
+				std::cout << traverse->nx1 << " , " << traverse->ny1 << " ,key: "<< traverse->nkey <<" ,next: " << traverse->nnkey<< " => ";
+
+			traverse = traverse->n_node;
+		}
+	}
+
+};
+//end linked list imp
+
+//start Hash Table
+class HashTable{
+private:
+ 	double_LL *table;
+	long total_elements;
+	// Hash function to calculate hash for an ip and return the key
+	long hash_it(long kk)
+	{
+		long key =kk % total_elements;//calculating the key by doing the simple modulus with the number of spots in the hash table
+		return key;
+	}
+
+public:
+  // Constructor to create a hash table with 'n' indices:
+  HashTable(int n){
+    total_elements = n;
+    table = new double_LL[total_elements];
+  }
+
+  // Insert data in the hash table:
+  void insertElement(int ix1,int iy1,int ikey, int inkey,MaxHeap ifrontHeep){
+
+    //hashing using the new key and the hashing function
+   
+
+    if(table[hash_it(ikey)].find(ikey)== 1){//already exists
+
+      table[hash_it(ikey)].fix_it(ikey,inkey);
+      
+    }else{//does not exist 
+      
+       table[hash_it(ikey)].add_end(ix1,iy1, ikey,inkey);
+
+       if(t_find_nkey(ikey)!= 1){//== 0 menas not next to someone
+       cout<<ikey<<"\n heaping \n";
+      //  ifrontHeep.insert(ikey,ikey);
+      ifrontHeep.insert(m,k);
+      m++;
+      k++;
+       }
+    }
+
+    // int tempkey = table[hash_it(ikey)].getnKey(ikey);
+    // while(tempKey != -1){
+    //   tempKey = table[hash_it(tempKey)].getnKey(tempKey);
+    // }
+
+    // table[hash_it(tempKey)].fixnKey(inkey);//even if the inkey is -1 it will just replace -1 with -1
+
+
+
+  }
+
+  // Remove data from the hash table:
+  /*
+  void removeElement(int key){
+    int x = hash_it(key);
+
+    list<int>::iterator i; 
+    for (i = table[x].begin(); i != table[x].end(); i++) { 
+      // Check if the iterator points to the required item:
+      if (*i == key) 
+        break;
+    }
+
+    // If the item was found in the list, then delete it:
+    if (i != table[x].end()) 
+      table[x].erase(i);
+  }
+*/
+  void printAll(){
+    // Traverse each index:
+    for(int i = 0; i < total_elements; i++){
+      cout << "Index " << i << ": ";
+      // Traverse the list at current index:
+       table[i].forward_print();
+	
+
+      cout << endl;
+    }
+  }
+  int t_find_nkey(int tkey){
+    // Traverse each index:
+    for(int i = 0; i < total_elements; i++){
+
+       if  (table[i].find_nkey(tkey)==1){
+          return table[i].find_nkey(tkey);
+       }
+
+    }
+    return 0;
+  }
+
+void print_groups(){
+  int gcnt=1;
+    // Traverse each index:
+    for(int i = 0; i < total_elements; i++){
+      cout << "Index " << i << ": ";
+      // Traverse the list at current index:
+       table[i].forward_grp();
+	
+
+      cout << endl;
+    }
+  }
+};
+//end hash table
+
+int main() {
+  // Create a hash table with 3 indices:
+  HashTable ht(5);
+  MaxHeap frontHeep = MaxHeap(10);
+  
+// frontHeep.insert(2.,30);
+
+  // Declare the data to be stored in the hash table:
+  int arx1[] = {2, 4, 6, 8, 10,20,14};
+   int ary1[] = {1, 3, 5, 7, 9,19,13};
+    int arx2[] = {12, 14, 16, 18, 20,22,24};
+     int ary2[] = {11, 13, 15, 17, 19,23,25};
+
+  // Insert the whole data into the hash table:
+  for(int i = 0; i < 7; i++){
+         //start making key by converting the ints to string then concatenate to creat key
+    string sx1 = to_string(arx1[i]);
+    string sy1 = to_string(ary1[i]);
+    string sx2 = to_string(arx2[i]);
+    string sy2 = to_string(ary2[i]);
+
+    int gkey1 = stoi( sx1 + sy1);
+    int gkey2 = stoi(sx2+sy2);
+
+    // frontHeep.insert(gkey2,gkey2);
+
+    //end making the key 
+    if(arx1[i]>arx2[i]){//if pt1 is bigger then set its next pt key t0 flag -1 , and set pt2 next key 
+        cout<< arx1[i]<<">"<<arx2[i]<<endl;
+
+       ht.insertElement(arx1[i],ary1[i],gkey1, -1,frontHeep);
+        ht.insertElement(ary1[i],ary2[i],gkey2, gkey1,frontHeep);//insert with X cord,y cord , own key, next point key
+
+    }else if(arx1[i]==arx2[i]){//if the x of both are equal then compare the ys
+    cout<< arx1[i]<<"=="<<arx2[i]<<endl;
+      if(ary1[i]>ary2[i]){//if y1 > y2 , then pt1next key = -1 and pt2 next ket = pt1key
+      ht.insertElement(arx1[i],ary1[i],gkey1, -1,frontHeep);
+      ht.insertElement(ary1[i],ary2[i],gkey2, gkey1,frontHeep);//insert with X cord,y cord , own key, next point key
+
+      }else{
+       ht.insertElement(arx1[i],ary1[i],gkey1, gkey2,frontHeep);//insert with X cord,y cord , own key, next point of group key
+       ht.insertElement(arx2[i],ary2[i],gkey2, -1,frontHeep);//next is set to flag to say end of this group
+
+      }
+
+      }else if(arx2[i]>arx1[i]){
+        cout<< arx1[i]<<"<"<<arx2[i]<<endl;
+       ht.insertElement(arx1[i],ary1[i],gkey1, gkey2,frontHeep);//insert with X cord,y cord , own key, next point of group key
+       ht.insertElement(arx2[i],ary2[i],gkey2, -1,frontHeep);//next is set to flag to say end of this group
+
+
+    }
+  }
+    
+
+  cout << "..:: Hash Table ::.." << endl;
+  ht.printAll();
+  
+  // ht.removeElement(4);
+  cout << endl << "..:: After deleting 4 ::.." << endl;
+  // ht.printAll();
+
+  // ht.print_groups();
+  frontHeep.print();
+ MaxHeap tree = MaxHeap(5);
+    tree.insert(2345678923, 50);
+    tree.insert(54367829, 30);
+    tree.insert(43526789, 20);
+    tree.insert(32456789, 40);
+    tree.insert(42567890, 60);
+    tree.print();
+ 
+
+  return 0;
+}

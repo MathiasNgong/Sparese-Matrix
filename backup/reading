@@ -1,0 +1,89 @@
+/*
+ *      Author: kompalli
+ */
+#include "ConnectedItems.h"
+
+void ConnectedItems::getConnectedItems(char *inputFilePath, char *outputFilePath)
+{
+	FILE *inFileStream = fopen(inputFilePath, "r");
+	if (!inFileStream)
+	{
+		char message[1024];
+		sprintf(message, "Cannot open input file for reading: %s", inputFilePath);
+		throw std::ios_base::failure(message);
+	}
+
+	FILE *outFileStream = fopen(outputFilePath, "w");
+	if (!outFileStream)
+	{
+		char message[1024];
+		sprintf(message, "Cannot open output file for writing: %s", outputFilePath);
+		throw std::ios_base::failure(message);
+	}
+
+	LogManager::writePrintfToLog(LogManager::Level::Status,
+								 "ConnectedItems::getConnectedItems",
+								 "Starting to process file %s", inputFilePath);
+
+	while (!feof(inFileStream))
+	{
+		
+		if (!feof(inFileStream))
+		{
+
+			//Variable declaration
+			char input1[255];
+			int x1,y1,x2,y2,grpNum;
+		
+
+			// begin extracting the ip addres and the number of requests
+			fgets(input1, 255, inFileStream); // reading the lines
+
+			// start processing line to extract currRow currCol and value
+				if (input1[0] == '\n')
+			{
+				continue;
+			}
+
+			std::string s = input1;
+
+			s.replace(0, 1, ""); //deleting the first braket
+
+			int len = s.length() - 1;
+
+			s.replace(len, 1, ""); //deleting the last bracket
+
+			char a[20];
+
+			strcpy(a, s.c_str()); //strcpy uses token varable to extract data using , as delimiter
+
+			char *token = strtok(a, ",");
+
+			x1 = atoi(token);
+
+			token = strtok(NULL, ",");
+
+			y1 = atoi(token);
+
+			token = strtok(NULL, ",");
+
+			x2 = atoi(token);
+			token = strtok(NULL, ",");
+
+			y2 = atoi(token);
+
+			token = strtok(NULL, ",");
+
+			grpNum = atoi(token);
+			std::cout << " X1 cord :  " << x1 << "  Y1 cord :  " << y1 <<" X2 cord :  " << x2 << "  Y2 cord :  " << y2 <<  "  grp num :  " << grpNum << std::endl;
+			//end extracting the ip addres and the number of requests
+
+		}
+	}
+
+	fflush(outFileStream);
+	fclose(outFileStream);
+
+	fclose(inFileStream);
+}
+

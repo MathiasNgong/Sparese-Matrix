@@ -1,0 +1,240 @@
+//
+#include <iostream>
+
+using namespace std;
+
+
+struct node //defining the node class(struct)
+{
+	int nx1,ny1,nkey,ngrp;
+  int nnkey;
+
+	node *p_node; // prevoous node ponter
+	node *n_node; //next node pointer
+};
+
+class double_LL
+{
+
+
+public:
+	node *front; // pointer to the first node of the list
+	node *end;	 // pointer to the last node of the list
+	// MaxHeap maxHeap1 = MaxHeap(100000000);
+	double_LL()
+	{
+		front = NULL;
+		end = NULL;
+	}
+	void add_end(int ax1,int ay1,int akey, int ankey)
+	{
+		// create new node
+		node *temp;
+		temp = new node();
+		temp->nx1 = ax1;
+    temp->ny1 = ay1;
+    temp->nkey = akey;
+    temp->nnkey = ankey;
+
+		temp->p_node = end;
+		temp->n_node = NULL;
+		// if list is empty
+		if (end == NULL)
+			front = temp;
+		else
+			end->n_node = temp;
+		end = temp;
+	}
+  int find(int fkey) //checking the list to see if the address is already there
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL) //traversing the list and checking if address is in it
+		{
+			if (traverse->nkey == fkey)
+			{
+				return 1;//return 1 for "tru it is there"
+			}
+			traverse = traverse->n_node;
+		}
+		return 0;//return 0 for "Not there"
+	}
+	int fix_it(int fkey,int fnkey) //checking the list to see if the address is already there
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL) //traversing the list and checking if address is in it
+		{
+			if (traverse->nkey == fkey)
+			{
+				traverse->nnkey=fnkey;
+			}
+			traverse = traverse->n_node;
+		}
+		return 1;
+	}
+	void increm(long key, int re) //increments the req for addresses that have been seen before
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL)
+		{
+
+			// cout<<traverse->data<<endl;
+			if (traverse->nkey == key)
+			{
+				traverse->ngrp= traverse->ngrp + re;
+			}
+			traverse = traverse->n_node;
+		}
+	}
+	void forward_print() //seasrching for the seen address
+	{
+		node *traverse;
+		traverse = front;
+		while (traverse != NULL)
+		{	
+				std::cout << traverse->nx1 << " , " << traverse->ny1 << " ,key: "<< traverse->nkey <<" ,next: " << traverse->nnkey<< " => ";
+
+			traverse = traverse->n_node;
+		}
+	}
+
+};
+//end linked list imp
+
+//start Hash Table
+class HashTable{
+private:
+ 	double_LL *table;
+	long total_elements;
+	// Hash function to calculate hash for an ip and return the key
+	long hash_it(long kk)
+	{
+		long key =kk % total_elements;//calculating the key by doing the simple modulus with the number of spots in the hash table
+		return key;
+	}
+
+public:
+  // Constructor to create a hash table with 'n' indices:
+  HashTable(int n){
+    total_elements = 5;
+    table = new double_LL[total_elements];
+  }
+
+  // Insert data in the hash table:
+  void insertElement(int ix1,int iy1,int ikey, int inkey){
+
+    //hashing using the new key and the hashing function
+   
+
+    if(table[hash_it(ikey)].find(ikey)== 1){
+
+      table[hash_it(ikey)].fix_it(ikey,inkey);
+      
+    }else{
+       table[hash_it(ikey)].add_end(ix1,iy1, ikey,inkey);
+
+    }
+
+    // int tempkey = table[hash_it(ikey)].getnKey(ikey);
+    // while(tempKey != -1){
+    //   tempKey = table[hash_it(tempKey)].getnKey(tempKey);
+    // }
+
+    // table[hash_it(tempKey)].fixnKey(inkey);//even if the inkey is -1 it will just replace -1 with -1
+
+
+
+  }
+
+  // Remove data from the hash table:
+  /*
+  void removeElement(int key){
+    int x = hash_it(key);
+
+    list<int>::iterator i; 
+    for (i = table[x].begin(); i != table[x].end(); i++) { 
+      // Check if the iterator points to the required item:
+      if (*i == key) 
+        break;
+    }
+
+    // If the item was found in the list, then delete it:
+    if (i != table[x].end()) 
+      table[x].erase(i);
+  }
+*/
+  void printAll(){
+    // Traverse each index:
+    for(int i = 0; i < total_elements; i++){
+      cout << "Index " << i << ": ";
+      // Traverse the list at current index:
+       table[i].forward_print();
+	
+
+      cout << endl;
+    }
+  }
+};
+//end hash table
+
+int main() {
+  // Create a hash table with 3 indices:
+  HashTable ht(3);
+
+  // Declare the data to be stored in the hash table:
+  int arx1[] = {2, 4, 6, 8, 10,20,14};
+   int ary1[] = {1, 3, 5, 7, 9,19,13};
+    int arx2[] = {12, 14, 16, 18, 20,22,24};
+     int ary2[] = {11, 13, 15, 17, 19,23,25};
+
+  // Insert the whole data into the hash table:
+  for(int i = 0; i < 7; i++){
+         //start making key by converting the ints to string then concatenate to creat key
+    string sx1 = to_string(arx1[i]);
+    string sy1 = to_string(ary1[i]);
+    string sx2 = to_string(arx2[i]);
+    string sy2 = to_string(ary2[i]);
+
+    int gkey1 = stoi( sx1 + sy1);
+    int gkey2 = stoi(sx2+sy2);
+
+    //end making the key 
+    if(arx1[i]>arx2[i]){//if pt1 is bigger then set its next pt key t0 flag -1 , and set pt2 next key 
+        cout<< arx1[i]<<">"<<arx2[i]<<endl;
+
+       ht.insertElement(arx1[i],ary1[i],gkey1, -1);
+        ht.insertElement(ary1[i],ary2[i],gkey2, gkey1);//insert with X cord,y cord , own key, next point key
+
+    }else if(arx1[i]==arx2[i]){//if the x of both are equal then compare the ys
+    cout<< arx1[i]<<"=="<<arx2[i]<<endl;
+      if(ary1[i]>ary2[i]){//if y1 > y2 , then pt1next key = -1 and pt2 next ket = pt1key
+      ht.insertElement(arx1[i],ary1[i],gkey1, -1);
+      ht.insertElement(ary1[i],ary2[i],gkey2, gkey1);//insert with X cord,y cord , own key, next point key
+
+      }else{
+       ht.insertElement(arx1[i],ary1[i],gkey1, gkey2);//insert with X cord,y cord , own key, next point of group key
+       ht.insertElement(arx2[i],ary2[i],gkey2, -1);//next is set to flag to say end of this group
+
+      }
+
+      }else if(arx2[i]>arx1[i]){
+        cout<< arx1[i]<<"<"<<arx2[i]<<endl;
+       ht.insertElement(arx1[i],ary1[i],gkey1, gkey2);//insert with X cord,y cord , own key, next point of group key
+       ht.insertElement(arx2[i],ary2[i],gkey2, -1);//next is set to flag to say end of this group
+
+
+    }
+  }
+    
+
+  cout << "..:: Hash Table ::.." << endl;
+  ht.printAll();
+  
+  // ht.removeElement(4);
+  cout << endl << "..:: After deleting 4 ::.." << endl;
+  ht.printAll();
+
+  return 0;
+}
